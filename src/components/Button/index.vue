@@ -8,22 +8,22 @@
 </template>
 
 <script setup lang="ts">
-import { NButton } from 'naive-ui'
+import { NButton } from 'naive-ui';
 
 interface Props {
   /** 按钮文本 */
-  text?: string
+  text?: string;
 }
 
 withDefaults(defineProps<Props>(), {
-  text: '默认按钮'
-})
+  text: '默认按钮',
+});
 
 const emit = defineEmits<{
-  (e: 'click', event: MouseEvent): void
-}>()
+  (e: 'click', event: MouseEvent): void;
+}>();
 
 const handleClick = (event: MouseEvent) => {
-  emit('click', event)
-}
+  emit('click', event);
+};
 </script> 

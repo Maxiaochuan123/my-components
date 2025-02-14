@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import { resolve } from 'path'
-import dts from 'vite-plugin-dts'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import { resolve } from 'path';
+import dts from 'vite-plugin-dts';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -10,24 +10,24 @@ export default defineConfig({
     dts({
       include: ['src/components/**/*.{ts,tsx,vue}'],
       exclude: ['src/dev/**/*'],
-      outDir: 'dist/types'
-    })
+      outDir: 'dist/types',
+    }),
   ],
   build: {
     lib: {
       entry: resolve(__dirname, 'src/components/index.ts'),
       name: 'MyComponents',
-      fileName: 'my-components'
+      fileName: 'my-components',
     },
     rollupOptions: {
       external: ['vue', 'naive-ui'],
       output: {
         globals: {
           vue: 'Vue',
-          'naive-ui': 'naive'
-        }
-      }
-    }
+          'naive-ui': 'naive',
+        },
+      },
+    },
   },
   // 开发环境配置
   server: {
@@ -36,7 +36,7 @@ export default defineConfig({
   // 设置入口文件
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src')
-    }
-  }
-})
+      '@': resolve(__dirname, 'src'),
+    },
+  },
+});

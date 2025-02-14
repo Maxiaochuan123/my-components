@@ -26,6 +26,7 @@
 
 <script setup lang="ts">
 // 组件已全局注册，无需导入
+console.log('App.vue');
 </script>
 
 <style scoped>
@@ -53,4 +54,4 @@ h2 {
   margin-bottom: 16px;
   color: #666;
 }
-</style> 
+</style>
