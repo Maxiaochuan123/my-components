@@ -15,10 +15,20 @@ export default defineConfig({
     }
   },
   themeConfig: {
+    logo: '/logo.svg',
+    
+    // 导航栏
     nav: [
       { text: '指南', link: '/guide/' },
-      { text: '组件', link: '/components/button/' }
+      { text: '组件', link: '/components/button' }
     ],
+
+    // 社交链接
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/Maxiaochuan123/my-components' }
+    ],
+
+    // 侧边栏
     sidebar: {
       '/guide/': [
         {
@@ -37,6 +47,12 @@ export default defineConfig({
           ]
         }
       ]
+    },
+
+    // 页脚
+    footer: {
+      message: 'Released under the MIT License.',
+      copyright: 'Copyright © 2024-present Your Name'
     }
   }
 }); 
