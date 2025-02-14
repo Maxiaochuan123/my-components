@@ -25,9 +25,9 @@ export default defineConfig({
         globals: {
           vue: 'Vue',
           'naive-ui': 'naive',
-        },
-      },
-    },
+        }
+      }
+    }
   },
   // 开发环境配置
   server: {

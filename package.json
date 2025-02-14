@@ -6,13 +6,19 @@
   "main": "src/components/index.ts",
   "module": "src/components/index.ts",
   "types": "src/vite-env.d.ts",
-  "files": ["dist", "src"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "link": "npm link && npm link vue naive-ui",
-    "unlink": "npm unlink vue naive-ui && npm unlink"
+    "unlink": "npm unlink vue naive-ui && npm unlink",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "peerDependencies": {
     "naive-ui": "^2.41.0",
@@ -22,11 +28,14 @@
     "@types/node": "^22.13.4",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/tsconfig": "^0.7.0",
+    "@vueuse/core": "^12.6.1",
     "naive-ui": "^2.41.0",
     "typescript": "~5.7.2",
     "vite": "^6.1.0",
     "vite-plugin-dts": "^4.5.0",
+    "vitepress": "^1.6.3",
     "vue": "^3.5.13",
+    "vue-router": "^4.5.0",
     "vue-tsc": "^2.2.0"
   }
 }
