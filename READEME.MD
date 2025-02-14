@@ -1,0 +1,1 @@
+# 基于 Git Dependencies 架构的 Vite + Vue3.5 + Typescript + NaviUi 组件库
