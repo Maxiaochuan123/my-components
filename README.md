@@ -453,6 +453,90 @@ const themeOverrides = {
 2. 合理使用 `!important`，避免过度使用
 3. 保持样式的一致性和可维护性
 
+### Q9: 使用 Git Dependencies 时，为什么只提交 dist 目录可能会导致问题？
+A: 这涉及到 npm 安装 Git 包时的工作机制：
+
+1. **现象描述**：
+   - 只提交 `dist` 目录的新版本，不提交源码修改
+   - 本地 `npm link` 测试正常
+   - 但从 GitHub 安装后显示的仍然是旧的内容
+
+2. **原因解释**：
+   当使用 Git URL 安装包时，npm 的工作流程是：
+   - 克隆整个仓库到临时目录
+   - 读取 `package.json` 中的配置
+   - 根据 `"files"` 字段指定的内容安装文件（默认包含 `package.json` 和 `README.md`）
+
+3. **为什么会出问题**：
+   - `dist` 目录中的文件是源代码编译的结果
+   - 如果只提交 `dist` 而不提交源码修改，那么：
+     - 其他人克隆仓库后重新构建会生成旧的代码
+     - 可能导致 `dist` 与源码不一致
+     - 造成维护困难
+
+4. **正确的做法**：
+   ```bash
+   # 1. 提交所有相关修改
+   git add src/components/YourComponent.vue
+   git add dist
+   git commit -m "feat: update component"
+   git push origin main
+
+   # 2. 在主项目中重新安装
+   cd your-project
+   npm uninstall my-components
+   npm install git+https://github.com/username/my-components.git#main
+   ```
+
+5. **安装后的目录结构**：
+   ```
+   node_modules/my-components/
+   ├── dist/           # 只包含构建产物
+   ├── package.json    # 包配置（默认包含）
+   └── README.md       # 文档（默认包含）
+   ```
+
+6. **为什么这样是对的**：
+   - 保持源码和构建产物的一致性
+   - 便于其他开发者理解变更
+   - 符合版本控制最佳实践
+   - 生产环境只安装必要文件，优化安装体积
+
+7. **验证方法**：
+   - 本地 `npm link` 测试
+   - 提交完整更改后重新安装验证
+   - 检查 `node_modules` 中的文件结构
+
+记住：虽然 `package.json` 中的 `"files"` 字段决定了哪些文件会被发布，但是良好的开发实践要求我们维护完整且一致的源代码和构建产物。
+
+### Q10: 如何在发布组件库之前，在本地测试组件库？
+**使用 file: 协议（推荐）**：
+   直接在主项目的 `package.json` 中使用本地文件路径：
+   ```json
+   {
+     "dependencies": {
+       "my-components": "file:../my-components"
+     }
+   }
+   ```
+   
+   然后执行：
+   ```bash
+   npm install
+   ```
+
+   **优势**：
+   - 更直接的文件引用方式
+   - 不需要全局注册
+   - 更接近实际使用场景
+   - 能够测试完整的构建流程
+   - 直接使用构建后的 `dist` 文件
+
+**最佳实践**：
+1. 开发初期：使用 `npm link` 进行快速迭代
+2. 发布前测试：使用 `file:` 协议验证构建结果
+3. 确认无误后：提交到 GitHub 并使用 Git URL
+
 ## 如何实施
 
 ### 1. 组件库设置
