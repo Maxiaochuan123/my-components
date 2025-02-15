@@ -3,8 +3,7 @@
     v-bind="$attrs"
     @click="handleClick"
   >
-    <!-- <slot>{{ text }}2222</slot> -->
-  11111
+    <slot>{{ text }}</slot>
   </n-button>
 </template>
 
