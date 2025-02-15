@@ -24,7 +24,7 @@ export default defineConfig({
       output: {
         globals: {
           vue: 'Vue',
-          'naive-ui': 'naive',
+          'naive-ui': 'naive'
         }
       }
     }

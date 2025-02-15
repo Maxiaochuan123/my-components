@@ -1,5 +1,6 @@
 import type { App } from 'vue';
 import type { Component } from 'vue';
+import naive from 'naive-ui';
 import config, { type ComponentsConfig } from '../config';
 
 interface ComponentModule {
@@ -48,8 +49,12 @@ const getComponents = (options: Partial<ComponentsConfig> = {}) => {
 // 导出 Vue 插件
 export default {
   install(app: App, options: Partial<ComponentsConfig> = {}) {
-    const components = getComponents(options);
+    // 确保先注册 naive-ui
+    if (!app.config.globalProperties.$naive) {
+      app.use(naive);
+    }
 
+    const components = getComponents(options);
     Object.entries(components).forEach(([name, component]) => {
       app.component(name, component);
     });

@@ -527,23 +527,63 @@ git push -u origin main
 ```
 
 ### 2. 在项目中使用
-项目可以通过多种方式引用组件库，根据需求选择合适的方式。
+项目可以通过多种方式引用组件库，根据不同环境选择合适的方式。
+
+#### 2.1 测试环境
+在测试环境中，我们通常希望使用最新的开发版本进行测试。可以通过以下方式使用 main 分支：
 
 ```json
 // package.json
 {
   "dependencies": {
-    // 方式1：使用主分支（不推荐用于生产环境）
-    "my-components": "git+https://github.com/username/my-components.git#main",
-    
-    // 方式2：使用特定标签版本（推荐用于生产环境）
-    "my-components": "git+https://github.com/username/my-components.git#v1.0.0",
-    
-    // 方式3：使用特定commit（用于临时测试或紧急修复）
-    "my-components": "git+https://github.com/username/my-components.git#commit-hash",
-    
-    // 方式4：使用特定分支（用于功能测试）
+    "my-components": "git+https://github.com/username/my-components.git#main"
+  }
+}
+```
+
+然后执行：
+```bash
+# 安装/更新到最新的 main 分支版本
+npm install
+
+# 或者直接更新组件库
+npm update my-components
+```
+
+3. 如果遇到问题，可以回退到特定的 commit：
+```bash
+npm install my-components@git+https://github.com/username/my-components.git#commit-hash
+```
+
+#### 2.2 生产环境
+生产环境建议使用特定的标签版本，确保稳定性：
+
+```json
+{
+  "dependencies": {
+    "my-components": "git+https://github.com/username/my-components.git#v1.0.0"
+  }
+}
+```
+
+#### 2.3 功能测试
+如果需要测试特定功能，可以使用功能分支：
+
+```json
+{
+  "dependencies": {
     "my-components": "git+https://github.com/username/my-components.git#feature/new-button"
+  }
+}
+```
+
+#### 2.4 紧急修复
+对于紧急问题的修复，可以使用特定的 commit：
+
+```json
+{
+  "dependencies": {
+    "my-components": "git+https://github.com/username/my-components.git#commit-hash"
   }
 }
 ```

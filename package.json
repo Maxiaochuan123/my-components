@@ -3,12 +3,18 @@
   "version": "1.0.0",
   "private": false,
   "type": "module",
-  "main": "src/components/index.ts",
-  "module": "src/components/index.ts",
-  "types": "src/vite-env.d.ts",
+  "main": "./dist/my-components.umd.js",
+  "module": "./dist/my-components.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/my-components.js",
+      "require": "./dist/my-components.umd.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "scripts": {
     "dev": "vite",

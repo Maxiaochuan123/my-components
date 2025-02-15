@@ -3,13 +3,13 @@
     v-bind="$attrs"
     @click="handleClick"
   >
-    <slot>{{ text }}</slot>
+    <!-- <slot>{{ text }}2222</slot> -->
+  11111
   </n-button>
 </template>
 
 <script setup lang="ts">
-import { NButton } from 'naive-ui';
-
+// 不再直接导入 NButton，使用全局注册的组件
 interface Props {
   /** 按钮文本 */
   text?: string;
