@@ -221,11 +221,11 @@ my-components/
 import { createApp } from 'vue'
 import naive from 'naive-ui'
 import App from './App.vue'
-import MyComponents from '../components'
+import Components from '../components'
 
 const app = createApp(App)
 app.use(naive)
-app.use(MyComponents)
+app.use(Components)
 app.mount('#app')
 ```
 
@@ -536,6 +536,140 @@ A: 这涉及到 npm 安装 Git 包时的工作机制：
 1. 开发初期：使用 `npm link` 进行快速迭代
 2. 发布前测试：使用 `file:` 协议验证构建结果
 3. 确认无误后：提交到 GitHub 并使用 Git URL
+
+### Q11: 为什么主项目的 Vite 配置需要 optimizeDeps 和 resolve？
+A: 这两个配置对于使用组件库的项目来说非常重要：
+
+1. **optimizeDeps 配置**：
+```javascript
+optimizeDeps: {
+  include: ['naive-ui', 'vue', 'my-components']
+}
+```
+
+这个配置的作用是：
+- 预构建依赖：Vite 会在开发服务器启动时预构建这些依赖
+- 为什么需要？
+  1. `naive-ui`：是一个大型 UI 库，预构建可以提高开发服务器的启动速度和热更新性能
+  2. `vue`：作为框架核心，预构建可以确保使用正确的版本，避免多实例问题
+  3. `my-components`：我们的组件库，预构建可以确保它与其他依赖的兼容性
+
+2. **resolve.dedupe 配置**：
+```javascript
+resolve: {
+  dedupe: ['vue', 'naive-ui']
+}
+```
+
+这个配置的作用是：
+- 强制使用单一版本：确保项目中只使用一个版本的 Vue 和 Naive UI
+- 为什么需要？
+  1. 避免多实例问题：如果存在多个 Vue 实例，会导致：
+     - 组件通信失效
+     - 响应式系统异常
+     - hooks 不正常工作
+  2. 确保 Naive UI 的主题和样式正常工作
+  3. 减小最终构建体积
+
+这两个配置的组合使用可以：
+1. 提高开发体验（更快的启动和热更新）
+2. 避免常见的依赖问题（多实例、版本冲突）
+3. 确保组件库正常工作
+
+这对于使用 Git Dependencies 方式引入组件库的项目特别重要，因为：
+1. 我们使用了 Git Dependencies 方式引入组件库
+2. 组件库依赖于 Vue 和 Naive UI
+3. 主项目也使用了相同的依赖
+
+所以这些配置帮助我们维持一个稳定和高效的开发环境。
+
+### Q12: 如何处理组件库的类型声明？
+A: 在使用 TypeScript 开发组件库时，类型声明是很重要的一部分。我们有两种方式来处理类型声明：
+
+1. **使用 vite-plugin-dts 自动生成（构建时）**：
+```typescript
+// vite.config.ts
+import dts from 'vite-plugin-dts'
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    dts({
+      include: ['src/components/**/*.{ts,tsx,vue}'],
+      exclude: ['src/dev/**/*'],
+      outDir: 'dist/types',
+    })
+  ]
+})
+```
+
+2. **手动维护声明文件（开发时）**：
+```typescript
+// src/vite-env.d.ts
+declare module 'my-components' {
+  import type { App } from 'vue'
+  
+  const plugin: {
+    install: (app: App) => void;
+  };
+  
+  export default plugin;
+}
+```
+
+**两种方式的对比**：
+
+1. **自动生成（vite-plugin-dts）**：
+   - ✅ 自动维护，减少手动工作
+   - ✅ 类型定义更准确和完整
+   - ✅ 适合复杂的组件库
+   - ❌ 构建时间可能较长
+   - ❌ 需要额外的构建配置
+
+2. **手动维护**：
+   - ✅ 更直接和简单
+   - ✅ 开发时立即生效
+   - ✅ 适合简单的组件库
+   - ❌ 需要手动更新
+   - ❌ 可能遗漏某些类型定义
+
+**最佳实践**：
+
+1. **开发阶段**：
+   使用手动声明文件（`vite-env.d.ts`）：
+   ```typescript
+   // 主项目的 src/vite-env.d.ts
+   declare module 'my-components' {
+     import type { App } from 'vue'
+     const plugin: {
+       install: (app: App) => void;
+     };
+     export default plugin;
+   }
+   ```
+
+2. **发布阶段**：
+   使用自动生成的类型声明：
+   ```json
+   {
+     "types": "./dist/types/index.d.ts"
+   }
+   ```
+
+3. **配置建议**：
+   - 开发时使用 `vite-env.d.ts` 提供基础类型支持
+   - 构建时使用 `vite-plugin-dts` 生成完整类型声明
+   - 在 `package.json` 中正确配置 `types` 字段
+
+4. **类型检查**：
+   - 在主项目中添加必要的类型声明
+   - 确保 `tsconfig.json` 配置正确
+   - 使用 IDE 的类型检查功能
+
+这样的配置可以：
+1. 在开发时获得即时的类型支持
+2. 在发布时提供完整的类型定义
+3. 确保类型定义的准确性和可维护性
 
 ## 如何实施
 
