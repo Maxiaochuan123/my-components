@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { NLayout, NLayoutSider, NLayoutHeader, NLayoutContent, NMenu } from 'naive-ui'
 import type { MenuOption } from 'naive-ui'
