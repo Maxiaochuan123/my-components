@@ -13,25 +13,46 @@ npm 发布方式需要额外的发布流程，而 Monorepo 方式会强制项目
 
 ## 方案对比
 
-### Git Dependencies
-通过 package.json 中的依赖配置引用 Git 仓库中的组件库。本质上是利用了 npm 对 Git 仓库的支持特性，
-可以直接在 package.json 中通过 Git URL 引用组件库。
+### npm 包发布
+通过将组件库发布到 npm 仓库，其他项目通过 npm install 安装使用。这是最传统和标准的组件库分发方式。
 
 **优势：**
-- 使用包管理器（npm）管理，流程自然
-- 安装和更新流程简单，只需 \`npm install\` 或 \`npm update\`
-- 项目相互独立，不会互相影响
-- 可以灵活切换版本，分支或 commit
-- 与现有构建工具和开发流程完全兼容
-- 不会改变项目结构
-- 不需要发布到 npm 仓库，但保持了类似的使用体验
-- 开发调试方便，可以通过 npm link 实现本地联调
+- 标准的包管理和分发方式
+- 版本管理规范，支持语义化版本
+- 完整的生态系统支持
+- 可以发布到公共或私有仓库
+- 依赖管理清晰
+- 支持自动化发布流程
+- 天然支持 CDN 分发
 
 **劣势：**
-- 每个项目都有完整副本，占用更多存储空间
-- 更新需要重新安装依赖
-- 不能直接在主项目中修改依赖代码
-- 首次安装和更新时需要完整克隆仓库
+- 需要额外的发布流程
+- 私有包需要付费或自建仓库
+- 每次修改都需要发版本
+- 本地开发调试相对繁琐
+- 版本更新需要所有项目手动升级
+- 不同版本之间的依赖可能产生冲突
+
+### Monorepo
+将组件库和使用它的项目都放在同一个代码仓库中管理，使用工具如 Lerna, pnpm workspace, Nx 等进行管理。
+
+**优势：**
+- 代码集中管理，便于维护
+- 可以共享配置和依赖
+- 原子提交，便于跟踪变更
+- 依赖关系明确
+- 支持多包联调
+- 工具链统一
+- 便于进行跨包修改
+
+**劣势：**
+- 仓库体积较大
+- 需要专门的工具链支持
+- CI/CD 配置复杂
+- 学习成本较高
+- 项目结构固定
+- 不利于项目解耦
+- 团队协作可能受限
 
 ### Git Submodule
 通过 git submodule 命令管理组件库。这是 Git 原生支持的子模块功能，可以将一个仓库作为另一个仓库的子目录。
@@ -51,6 +72,25 @@ npm 发布方式需要额外的发布流程，而 Monorepo 方式会强制项目
 - 可能导致项目结构复杂化
 - 容易出现同步问题
 - 对开发工具的集成支持不如 npm 方式友好
+
+### Git Dependencies
+通过 package.json 中的依赖配置引用 Git 仓库中的组件库。本质上是利用了 npm 对 Git 仓库的支持特性，
+可以直接在 package.json 中通过 Git URL 引用组件库。
+
+**优势：**
+- 使用包管理器（npm）管理，流程自然
+- 安装和更新流程简单，只需 \`npm install\` 或 \`npm update\`
+- 项目相互独立，不会互相影响
+- 可以灵活切换版本，分支或 commit
+- 与现有构建工具和开发流程完全兼容
+- 不会改变项目结构
+- 不需要发布到 npm 仓库，但保持了类似的使用体验
+- 开发调试方便，可以通过 npm link 实现本地联调
+
+**劣势：**
+- 首次安装和更新时需要完整克隆仓库，可能较慢
+- 更新需要重新安装依赖
+- 需要额外的分支管理和版本控制策略
 
 ## 为什么选择 Git Dependencies？
 
@@ -82,14 +122,7 @@ npm 发布方式需要额外的发布流程，而 Monorepo 方式会强制项目
 
 ## 常见问题
 
-### Q1: 为什么不直接发布到 npm？
-A: 发布到 npm 需要额外的发布流程，而且：
-1. 私有包需要付费或自建 npm 仓库
-2. 每次修改都需要发布新版本
-3. 本地调试不如 Git 方案方便
-4. 对于内部使用的组件库来说过于复杂
-
-### Q2: 为什么要执行 npm link vue naive-ui？直接 npm link 不行吗？
+### Q1: 为什么要执行 npm link vue naive-ui？直接 npm link 不行吗？
 A: 这涉及到 Vue 的多实例问题：
 
 1. **为什么需要这样做**：
@@ -108,25 +141,9 @@ A: 这涉及到 Vue 的多实例问题：
 {
   "scripts": {
     "link": "npm link && npm link vue naive-ui",
-    "unlink": "npm unlink vue naive-ui && npm unlink"
+    "unlink": "npm rm --global my-components"
   }
 }
-```
-
-这样就可以简单地使用：
-```bash
-# 在组件库目录
-npm run link    # 创建全局链接并链接到主项目的依赖
-
-# 在主项目目录
-npm link my-components
-
-# 取消链接时：
-# 在主项目目录
-npm unlink my-components
-
-# 在组件库目录
-npm run unlink  # 移除全局链接（使用 npm rm --global）
 ```
 
 如果遇到以下情况，很可能是多实例导致的：
@@ -135,7 +152,7 @@ npm run unlink  # 移除全局链接（使用 npm rm --global）
 - NaiveUI 的主题或样式异常
 - Vue 的开发工具显示多个 Vue 实例
 
-### Q3: 组件库和主项目使用相同的 UI 框架（如 NaiveUI）会有冲突吗？
+### Q2: 组件库和主项目使用相同的 UI 框架（如 NaiveUI）会有冲突吗？
 A: 这是一个常见的问题，通过合理配置可以避免冲突：
 
 1. 在组件库中将 UI 框架设置为 peerDependency：
@@ -181,7 +198,7 @@ npm link vue naive-ui
 - 减小打包体积
 - 确保版本一致性
 
-### Q4: 组件库如何独立开发和调试？
+### Q3: 组件库如何独立开发和调试？
 A: 组件库项目需要包含完整的开发环境：
 
 1. 目录结构：
@@ -229,13 +246,13 @@ app.mount('#app')
 3. 方便编写示例和文档
 4. 确保组件的独立性
 
-### Q5: 如何更新组件库？
+### Q4: 如何更新组件库？
 A: 根据不同场景选择更新方式：
 
 1. 开发环境：
-   - 使用 npm link 实时更新
-   - 修改即可看到效果
-   - 无需提交代码
+   - 使用 npm link 进行本地开发
+   - 基于 Vite 的热更新，修改即可实时预览
+   - 无需手动重启或重新构建
 
 2. 测试环境：
    - 使用特定分支或 commit
@@ -256,7 +273,7 @@ npm update my-components
 npm install my-components@git+https://github.com/username/my-components.git#v1.0.1
 ```
 
-### Q6: 如何管理组件库版本？
+### Q5: 如何管理组件库版本？
 A: 采用语义化版本管理：
 
 1. 版本号规则：
@@ -281,7 +298,7 @@ git push origin main --tags
    - 说明不兼容的修改
    - 标注废弃的功能
 
-### Q7: 为什么需要 peerDependencies？devDependencies 不够用吗？
+### Q6: 为什么需要 peerDependencies？devDependencies 不够用吗？
 A: `peerDependencies` 和 `devDependencies` 的作用是不同的：
 
 1. **devDependencies（开发依赖）**：
@@ -320,7 +337,7 @@ A: `peerDependencies` 和 `devDependencies` 的作用是不同的：
 3. 避免重复安装核心依赖
 4. 防止版本冲突
 
-### Q8: 每次开机启动项目都需要执行 npm link 吗？
+### Q7: 每次开机启动项目都需要执行 npm link 吗？
 A: 不需要。npm link 创建的是全局符号链接，一旦建立就会持续存在，除非：
 
 1. 显式地执行了 `npm unlink`
@@ -350,6 +367,92 @@ npm run dev
 - ❌ 不需要每次开机都 link
 - 🔄 只有在链接被破坏时才需要重新 link
 
+### Q8: 主项目能覆盖组件库的默认样式吗？
+A: 是的，主项目可以通过两种方式覆盖组件库的样式：
+
+1. **通过 NaiveUI 的主题系统**：
+```ts
+<script setup lang="ts">
+import { NConfigProvider } from 'naive-ui'
+
+const themeOverrides = {
+  common: {
+    primaryColor: '#ff6600'
+  }
+}
+</script>
+
+<template>
+  <n-config-provider :theme-overrides="themeOverrides">
+    <div class="container">
+      <h1>测试组件库</h1>
+      <div class="demo-section">
+        <h2>按钮组件</h2>
+        <div class="button-group">
+          <my-button></my-button>
+          <my-button type="primary">主要按钮</my-button>
+          <my-button type="success">成功按钮</my-button>
+          <my-button type="warning">警告按钮</my-button>
+          <my-button type="error">错误按钮</my-button>
+        </div>
+      </div>
+    </div>
+  </n-config-provider>
+</template>
+```
+
+2. **通过全局 CSS 覆盖**：
+```css
+<!-- 全局样式 -->
+<style>
+/* 修改所有按钮的基础样式 */
+.n-button {
+  border-radius: 20px !important;  /* 圆角按钮 */
+  height: 40px !important;         /* 统一高度 */
+  padding: 0 24px !important;      /* 左右内边距 */
+  font-weight: bold !important;    /* 粗体文字 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important; /* 添加阴影 */
+  transition: all 0.3s ease !important;  /* 平滑过渡效果 */
+}
+
+/* 悬停效果 */
+.n-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* 点击效果 */
+.n-button:active {
+  transform: translateY(1px) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+</style>
+
+```
+
+这两种方式都能覆盖组件库样式，并且这两种方式各有优势：
+
+1. **主题系统**：
+   - 使用 NaiveUI 的原生主题机制
+   - 更加可控和可维护
+   - 适合系统级的样式定制
+   - 不需要使用 `!important`
+
+2. **全局 CSS**：
+   - 更灵活，可以修改任何样式属性
+   - 可以添加新的样式效果（如阴影、动画）
+   - 适合项目级的深度定制
+   - 可能需要使用 `!important` 来确保优先级
+
+推荐的使用方式：
+- 颜色、尺寸等主题相关的样式 → 使用主题系统
+- 特殊的交互效果和视觉效果 → 使用全局 CSS
+
+注意事项：
+1. 使用全局 CSS 时要注意选择器的优先级
+2. 合理使用 `!important`，避免过度使用
+3. 保持样式的一致性和可维护性
+
 ## 如何实施
 
 ### 1. 组件库设置
@@ -376,7 +479,7 @@ npm init vite@latest . -- --template vue-ts
     "build": "vite build",               # 构建库
     "preview": "vite preview",            # 预览构建结果
     "link": "npm link && npm link vue naive-ui",
-    "unlink": "npm unlink vue naive-ui && npm unlink"
+    "unlink": "npm rm --global my-components"
   },
   "peerDependencies": {                  # 对等依赖，由主项目提供
     "naive-ui": "^2.x",
@@ -499,11 +602,11 @@ npm run dev
 cd my-project
 npm run dev
 
-# 4. 完成调试后取消链接
+# 4. 完成调试后取消链接(也可以不取消，下次使用就不需要再次link，直接npm run dev即可)
 cd my-project
-npm unlink my-components
+npm run unlink
 cd ../my-components
-npm unlink
+npm run unlink
 ```
 
 ## 最佳实践
