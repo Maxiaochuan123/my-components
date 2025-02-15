@@ -116,10 +116,17 @@ A: 这涉及到 Vue 的多实例问题：
 这样就可以简单地使用：
 ```bash
 # 在组件库目录
-npm run link
+npm run link    # 创建全局链接并链接到主项目的依赖
 
 # 在主项目目录
 npm link my-components
+
+# 取消链接时：
+# 在主项目目录
+npm unlink my-components
+
+# 在组件库目录
+npm run unlink  # 移除全局链接（使用 npm rm --global）
 ```
 
 如果遇到以下情况，很可能是多实例导致的：

@@ -15,7 +15,7 @@
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "link": "npm link && npm link vue naive-ui",
-    "unlink": "npm unlink vue naive-ui && npm unlink",
+    "unlink": "npm rm --global my-components",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
