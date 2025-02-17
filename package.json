@@ -6,13 +6,6 @@
   "main": "src/components/index.ts",
   "module": "src/components/index.ts",
   "types": "src/vite-env.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/my-components.js",
-      "require": "./dist/my-components.umd.js",
-      "types": "./dist/types/index.d.ts"
-    }
-  },
   "files": [
     "dist"
   ],
@@ -21,7 +14,7 @@
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "link": "npm link && npm link vue naive-ui",
-    "unlink": "npm rm --global my-components",
+    "unlink": "npm unlink my-components && npm rm --global my-components",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"

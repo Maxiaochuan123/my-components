@@ -148,14 +148,6 @@ my-components/
   "main": "src/components/index.ts",
   "module": "src/components/index.ts",
   "types": "src/vite-env.d.ts",
-  // file: 和 Git URL 模式 访问 dist 目录
-  "exports": {
-    ".": {
-      "import": "./dist/my-components.js",
-      "require": "./dist/my-components.umd.js",
-      "types": "./dist/types/index.d.ts"
-    }
-  },
   // 当使用 Git URL 安装 npm 包时，会自动下载 dist 目录
   "files": ["dist"],
   "scripts": {
@@ -200,11 +192,42 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/components/index.ts'),
       name: 'MyComponents',
-      fileName: 'my-components'
+      fileName: 'my-components',
+      formats: ['es']
     },
     rollupOptions: {
       // 外部化 Vue 和 NaiveUI，避免重复打包
-      external: ['vue', 'naive-ui']
+      external: ['vue', 'naive-ui'],
+
+      // 在打包时生成 package.json
+      output: {
+        // 在这里添加 hooks
+        plugins: [{
+          name: 'generate-package-json',
+          generateBundle() {
+            const pkg = require('./package.json');
+            const distPkg = {
+              name: pkg.name,
+              version: pkg.version,
+              type: pkg.type,
+              module: './my-components.js',
+              types: './types/index.d.ts',
+              exports: {
+                ".": {
+                  "types": "./types/index.d.ts",
+                  "import": "./my-components.js",
+                  "require": "./my-components.umd.js"
+                }
+              },
+              peerDependencies: pkg.peerDependencies
+            };
+            writeFileSync(
+              'dist/package.json',
+              JSON.stringify(distPkg, null, 2)
+            );
+          }
+        }]
+      }
     }
   },
   // 预构建 naive-ui 和 vue，提高开发服务器性能，确保依赖版本一致性
@@ -235,10 +258,7 @@ import Components from '../components';
 const app = createApp(App);
 app.use(naive);
 app.use(router);
-// 可以使用默认前缀 'My'
 app.use(Components);
-// 或者自定义前缀
-// app.use(Components, { prefix: 'Cool' })
 app.mount('#app');
 ```
 
@@ -265,6 +285,15 @@ declare module 'my-components' {
   
   export default plugin;
 }
+```
+
+### 6. 修改组件前缀
+```typescript
+// src/config/index.ts
+export const defaultConfig: ComponentsConfig = {
+  prefix: 'My', // 默认 My 前缀
+  nameStyle: 'pascal', // 默认 pascal 命名风格
+};
 ```
 
 ## 三、组件库开发与调试
@@ -309,7 +338,7 @@ npm run dev
 // my-project/package.json
 {
   "dependencies": {
-    "my-components": "file:../my-components"
+    "my-components": "file:../my-components/dist"
   }
 }
 ```
@@ -335,7 +364,7 @@ git push origin main --tags
 ### 4.2 使用
 <!-- 主项目中配置快捷指令 -->
 ```json
-"file": "npm install file:../my-components",        // 从本地文件安装
+"file": "npm install file:../my-components/dist",        // 从本地文件安装
 
 // （Git URL）
 "gitUrlBranch": "npm install github:Maxiaochuan123/my-components#main",  // 从 GitHub main 分支安装
@@ -481,7 +510,7 @@ A: 不会冲突
 ```json
 {
   "scripts": {
-    "file": "npm install file:../my-components",        // 从本地文件安装
+    "file": "npm install file:../my-components/dist",        // 从本地文件安装
     "gitUrlBranch": "npm install github:Maxiaochuan123/my-components#main",  // 从 GitHub main 分支安装
     "gitUrlTag": "npm install github:Maxiaochuan123/my-components#v1.0.0"    // 从 GitHub v1.0.0 标签安装
   }
