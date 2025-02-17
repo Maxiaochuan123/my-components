@@ -32,6 +32,8 @@ export default defineConfig({
       // 告诉打包工具，vue 和 naive-ui 是外部依赖，不要打包进组件库
       external: ['vue', 'naive-ui'],
       output: {
+        preserveModules: true, // 添加这个配置
+        preserveModulesRoot: 'src', // 添加这个配置
         // 在这里添加 hooks
         plugins: [{
           name: 'generate-package-json',
@@ -46,8 +48,7 @@ export default defineConfig({
               exports: {
                 ".": {
                   "types": "./types/index.d.ts",
-                  "import": "./my-components.js",
-                  "require": "./my-components.umd.js"
+                  "import": "./my-components.js"
                 }
               },
               peerDependencies: pkg.peerDependencies

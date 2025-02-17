@@ -7,8 +7,7 @@
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./my-components.js",
-      "require": "./my-components.umd.js"
+      "import": "./my-components.js"
     }
   },
   "peerDependencies": {
