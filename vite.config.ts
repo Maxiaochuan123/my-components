@@ -41,14 +41,9 @@ export default defineConfig({
               name: pkg.name,
               version: pkg.version,
               type: pkg.type,
-              module: './my-components.js',
-              types: './types/index.d.ts',
-              exports: {
-                ".": {
-                  "types": "./types/index.d.ts",
-                  "import": "./my-components.js"
-                }
-              },
+              main: 'my-components.js',
+              module: 'my-components.js',
+              types: 'types/index.d.ts',
               peerDependencies: pkg.peerDependencies
             };
             writeFileSync(
