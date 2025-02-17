@@ -1,36 +1,36 @@
 <template>
-  <n-layout has-sider>
-    <!-- 侧边栏 -->
-    <n-layout-sider
-      bordered
-      collapse-mode="width"
-      :collapsed-width="64"
-      :width="240"
-      :native-scrollbar="false"
-      class="layout-sider"
-    >
-      <n-menu
+    <n-layout has-sider>
+      <!-- 侧边栏 -->
+      <n-layout-sider
+        bordered
+        collapse-mode="width"
         :collapsed-width="64"
-        :collapsed-icon-size="22"
-        :options="menuOptions"
-        :value="activeKey"
-        @update:value="handleMenuClick"
-      />
-    </n-layout-sider>
+        :width="240"
+        :native-scrollbar="false"
+        class="layout-sider"
+      >
+        <n-menu
+          :collapsed-width="64"
+          :collapsed-icon-size="22"
+          :options="menuOptions"
+          :value="activeKey"
+          @update:value="handleMenuClick"
+        />
+      </n-layout-sider>
 
-    <!-- 主内容区 -->
-    <n-layout>
-      <n-layout-header bordered class="layout-header">
-        <div class="header-content">
-          <h2>My Components</h2>
-        </div>
-      </n-layout-header>
+      <!-- 主内容区 -->
+      <n-layout>
+        <n-layout-header bordered class="layout-header">
+          <div class="header-content">
+            <h2>My Components</h2>
+          </div>
+        </n-layout-header>
 
-      <n-layout-content class="layout-content">
-        <router-view></router-view>
-      </n-layout-content>
+        <n-layout-content class="layout-content">
+          <router-view></router-view>
+        </n-layout-content>
+      </n-layout>
     </n-layout>
-  </n-layout>
 </template>
 
 <script setup lang="ts">

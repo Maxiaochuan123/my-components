@@ -8,7 +8,6 @@
 </template>
 
 <script setup lang="ts">
-// 不再直接导入 NButton，使用全局注册的组件
 interface Props {
   /** 按钮文本 */
   text?: string;
