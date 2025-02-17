@@ -14,6 +14,15 @@ export default defineConfig({
       exclude: ['src/dev/**/*'],
       outDir: 'dist/types',
     }),
+    {
+      name: 'fix-config-import',
+      resolveId(source: string, importer: string | undefined) {
+        if (source === './config' && importer?.includes('components/index')) {
+          return resolve(__dirname, 'src/components/config/index.ts');
+        }
+        return null;
+      }
+    }
   ],
   build: {
     // 库模式配置，指定入口文件和输出格式
