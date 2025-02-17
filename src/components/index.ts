@@ -1,7 +1,7 @@
 import type { App } from 'vue';
 import type { Component } from 'vue';
 import naive from 'naive-ui';
-import config, { type ComponentsConfig } from '@/config';
+import config, { type ComponentsConfig } from '../config';
 
 interface ComponentModule {
   default: Component;

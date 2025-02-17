@@ -15,11 +15,6 @@ export default defineConfig({
       outDir: 'dist/types',
     }),
   ],
-  // server: {
-  //   fs: {
-  //     strict: false  // 添加这个配置，允许访问工作区以外的文件
-  //   }
-  // },
   build: {
     // 库模式配置，指定入口文件和输出格式
     lib: {
@@ -32,11 +27,6 @@ export default defineConfig({
       // 告诉打包工具，vue 和 naive-ui 是外部依赖，不要打包进组件库
       external: ['vue', 'naive-ui'],
       output: {
-        // preserveModules: true,
-        // preserveModulesRoot: 'src',
-        // dir: 'dist',
-        // entryFileNames: '[name].js',
-        // manualChunks: undefined,
         // 在这里添加 hooks
         plugins: [{
           name: 'generate-package-json',
