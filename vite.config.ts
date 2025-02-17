@@ -12,30 +12,24 @@ export default defineConfig({
     dts({
       include: ['src/components/**/*.{ts,tsx,vue}'],
       exclude: ['src/dev/**/*'],
-      outDir: 'dist/types',
-    }),
-    {
-      name: 'fix-config-import',
-      resolveId(source: string, importer: string | undefined) {
-        if (source === './config' && importer?.includes('components/index')) {
-          return resolve(__dirname, 'src/components/config/index.ts');
-        }
-        return null;
-      }
-    }
+      outDir: 'dist',
+    })
   ],
   build: {
     // 库模式配置，指定入口文件和输出格式
     lib: {
       entry: resolve(__dirname, 'src/components/index.ts'),
       name: 'MyComponents',
-      fileName: 'my-components',
+      // fileName: (format) => `components/index.${format}.js`,
       formats: ['es'],
     },
     rollupOptions: {
       // 告诉打包工具，vue 和 naive-ui 是外部依赖，不要打包进组件库
       external: ['vue', 'naive-ui'],
       output: {
+        preserveModules: true,
+        preserveModulesRoot: 'src',
+        dir: 'dist',
         // 在这里添加 hooks
         plugins: [{
           name: 'generate-package-json',
@@ -45,12 +39,12 @@ export default defineConfig({
               name: pkg.name,
               version: pkg.version,
               type: pkg.type,
-              module: './my-components.js',
-              types: './types/index.d.ts',
+              module: './components/index.js',
+              types: './components/index.d.ts',
               exports: {
                 ".": {
-                  "types": "./types/index.d.ts",
-                  "import": "./my-components.js"
+                  "types": "./components/index.d.ts",
+                  "import": "./components/index.js"
                 }
               },
               peerDependencies: pkg.peerDependencies
