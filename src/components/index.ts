@@ -1,11 +1,24 @@
 import type { App } from 'vue';
 import type { Component } from 'vue';
 import naive from 'naive-ui';
-import config, { type ComponentsConfig } from './a';
+// import type { ComponentsConfig } from './config';
+// import config, { type ComponentsConfig } from './config';
 
 interface ComponentModule {
   default: Component;
 }
+
+export interface ComponentsConfig {
+  /** 组件前缀 */
+  prefix: string;
+  /** 组件命名风格 pascal:MyButton camel:myButton kebab:my-button */
+  nameStyle: 'pascal' | 'camel' | 'kebab';
+}
+
+export const defaultConfig: ComponentsConfig = {
+  prefix: 'Mxc', // 默认 My 前缀
+  nameStyle: 'pascal', // 默认 pascal 命名风格
+};
 
 // 自动导入所有组件
 const componentModules = import.meta.glob<ComponentModule>('./*/index.vue', {
@@ -14,7 +27,7 @@ const componentModules = import.meta.glob<ComponentModule>('./*/index.vue', {
 
 // 从路径中提取组件名
 const getComponents = (options: Partial<ComponentsConfig> = {}) => {
-  const finalConfig = { ...config, ...options };
+  const finalConfig = { ...defaultConfig, ...options };
   const { prefix, nameStyle } = finalConfig;
 
   const formatName = (name: string) => {
