@@ -12,25 +12,26 @@ export default defineConfig({
     dts({
       include: ['src/components/**/*.{ts,tsx,vue}'],
       exclude: ['src/dev/**/*'],
-      outDir: 'dist',
-    })
+      outDir: 'dist/types',
+    }),
   ],
+  // server: {
+  //   fs: {
+  //     strict: false  // 添加这个配置，允许访问工作区以外的文件
+  //   }
+  // },
   build: {
     // 库模式配置，指定入口文件和输出格式
     lib: {
       entry: resolve(__dirname, 'src/components/index.ts'),
       name: 'MyComponents',
-      // fileName: (format) => `components/index.${format}.js`,
+      fileName: 'my-components',
       formats: ['es'],
     },
     rollupOptions: {
       // 告诉打包工具，vue 和 naive-ui 是外部依赖，不要打包进组件库
       external: ['vue', 'naive-ui'],
       output: {
-        preserveModules: false,
-        // preserveModulesRoot: 'src',
-        entryFileNames: 'my-components.js',
-        dir: 'dist',
         // 在这里添加 hooks
         plugins: [{
           name: 'generate-package-json',
@@ -41,10 +42,10 @@ export default defineConfig({
               version: pkg.version,
               type: pkg.type,
               module: './my-components.js',
-              types: './index.d.ts',
+              types: './types/index.d.ts',
               exports: {
                 ".": {
-                  "types": "./index.d.ts",
+                  "types": "./types/index.d.ts",
                   "import": "./my-components.js"
                 }
               },
