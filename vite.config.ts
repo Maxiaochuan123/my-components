@@ -2,27 +2,27 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
 import dts from 'vite-plugin-dts';
-import fs from 'fs';
+// import fs from 'fs';
 
-interface PackageJson {
-  name: string;
-  version: string;
-  type: string;
-  main: string;
-  module: string;
-  types: string;
-  files: string[];
-  scripts: Record<string, string>;
-  peerDependencies: Record<string, string>;
-  devDependencies: Record<string, string>;
-}
+// interface PackageJson {
+//   name: string;
+//   version: string;
+//   type: string;
+//   main: string;
+//   module: string;
+//   types: string;
+//   files: string[];
+//   scripts: Record<string, string>;
+//   peerDependencies: Record<string, string>;
+//   devDependencies: Record<string, string>;
+// }
 
-// 读取和写入 package.json
-const packageJsonPath = './package.json';
-const readPackageJson = (): PackageJson => JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-const writePackageJson = (content: PackageJson): void => {
-  fs.writeFileSync(packageJsonPath, JSON.stringify(content, null, 2) + '\n');
-};
+// // 读取和写入 package.json
+// const packageJsonPath = './package.json';
+// const readPackageJson = (): PackageJson => JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+// const writePackageJson = (content: PackageJson): void => {
+//   fs.writeFileSync(packageJsonPath, JSON.stringify(content, null, 2) + '\n');
+// };
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -35,31 +35,31 @@ export default defineConfig({
       outDir: 'dist/types',
     }),
     // 自动修改 package.json 路径的插件
-    {
-      name: 'modify-package-json',
-      buildStart() {
-        // 构建开始前：修改为 dist 路径
-        const pkg = readPackageJson();
-        const distPkg = {
-          ...pkg,
-          main: './dist/my-components.js',
-          module: './dist/my-components.js',
-          types: './dist/types/index.d.ts'
-        };
-        writePackageJson(distPkg);
-      },
-      closeBundle() {
-        // 构建结束后：改回 src 路径
-        const pkg = readPackageJson();
-        const srcPkg = {
-          ...pkg,
-          main: 'src/components/index.ts',
-          module: 'src/components/index.ts',
-          types: 'src/vite-env.d.ts'
-        };
-        writePackageJson(srcPkg);
-      }
-    }
+    // {
+    //   name: 'modify-package-json',
+    //   buildStart() {
+    //     // 构建开始前：修改为 dist 路径
+    //     const pkg = readPackageJson();
+    //     const distPkg = {
+    //       ...pkg,
+          // main: './dist/my-components.js',
+          // module: './dist/my-components.js',
+          // types: './dist/types/index.d.ts'
+    //     };
+    //     writePackageJson(distPkg);
+    //   },
+    //   closeBundle() {
+    //     // 构建结束后：改回 src 路径
+    //     const pkg = readPackageJson();
+    //     const srcPkg = {
+    //       ...pkg,
+    //       main: 'src/components/index.ts',
+    //       module: 'src/components/index.ts',
+    //       types: 'src/vite-env.d.ts'
+    //     };
+    //     writePackageJson(srcPkg);
+    //   }
+    // }
   ],
   build: {
     // 库模式配置，指定入口文件和输出格式
