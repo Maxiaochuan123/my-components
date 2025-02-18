@@ -144,10 +144,17 @@ my-components/
   "name": "my-components",
   "version": "1.0.0",
   "type": "module",
+  
   // 本地 link 模式 访问 src 目录
   "main": "src/components/index.ts",
   "module": "src/components/index.ts",
   "types": "src/vite-env.d.ts",
+  
+//   打包时手动切换为 dist
+//   "main": "./dist/my-components.js",
+//   "module": "./dist/my-components.js",
+//   "types": "./dist/types/index.d.ts",
+
   // 当使用 Git URL 安装 npm 包时，会自动下载 dist 目录
   "files": ["dist"],
   "scripts": {
@@ -201,7 +208,7 @@ export default defineConfig({
 
       // 在打包时生成 package.json
       output: {
-        // 在这里添加 hooks
+        // 在打包时生成 package.json
         plugins: [{
           name: 'generate-package-json',
           generateBundle() {
@@ -210,15 +217,9 @@ export default defineConfig({
               name: pkg.name,
               version: pkg.version,
               type: pkg.type,
+              main: './my-components.js',
               module: './my-components.js',
               types: './types/index.d.ts',
-              exports: {
-                ".": {
-                  "types": "./types/index.d.ts",
-                  "import": "./my-components.js",
-                  "require": "./my-components.umd.js"
-                }
-              },
               peerDependencies: pkg.peerDependencies
             };
             writeFileSync(
