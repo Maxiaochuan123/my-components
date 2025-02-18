@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
 import dts from 'vite-plugin-dts';
+import { writeFileSync } from 'fs';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -24,7 +25,29 @@ export default defineConfig({
     },
     rollupOptions: {
       // 告诉打包工具，vue 和 naive-ui 是外部依赖，不要打包进组件库
-      external: ['vue', 'naive-ui']
+      external: ['vue', 'naive-ui'],
+      output: {
+        // 在打包时生成 package.json
+        plugins: [{
+          name: 'generate-package-json',
+          generateBundle() {
+            const pkg = require('./package.json');
+            const distPkg = {
+              name: pkg.name,
+              version: pkg.version,
+              type: pkg.type,
+              main: './my-components.js',
+              module: './my-components.js',
+              types: './types/index.d.ts',
+              peerDependencies: pkg.peerDependencies
+            };
+            writeFileSync(
+              'dist/package.json',
+              JSON.stringify(distPkg, null, 2)
+            );
+          }
+        }]
+      }
     },
   },
   // 预构建 naive-ui 和 vue，提高开发服务器性能，确保依赖版本一致性

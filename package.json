@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": false,
   "type": "module",
-  "main": "./dist/my-components.js",
-  "module": "./dist/my-components.js",
-  "types": "./dist/types/index.d.ts",
+  "main": "src/components/index.ts",
+  "module": "src/components/index.ts",
+  "types": "src/vite-env.d.ts",
   "files": [
     "dist"
   ],
