@@ -1,8 +1,28 @@
 import { defineConfig } from 'vite';
-import { writeFileSync, copyFileSync } from 'fs';
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
 import dts from 'vite-plugin-dts';
+import fs from 'fs';
+
+interface PackageJson {
+  name: string;
+  version: string;
+  type: string;
+  main: string;
+  module: string;
+  types: string;
+  files: string[];
+  scripts: Record<string, string>;
+  peerDependencies: Record<string, string>;
+  devDependencies: Record<string, string>;
+}
+
+// 读取和写入 package.json
+const packageJsonPath = './package.json';
+const readPackageJson = (): PackageJson => JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+const writePackageJson = (content: PackageJson): void => {
+  fs.writeFileSync(packageJsonPath, JSON.stringify(content, null, 2) + '\n');
+};
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -14,12 +34,33 @@ export default defineConfig({
       exclude: ['src/dev/**/*'],
       outDir: 'dist/types',
     }),
+    // 自动修改 package.json 路径的插件
+    {
+      name: 'modify-package-json',
+      buildStart() {
+        // 构建开始前：修改为 dist 路径
+        const pkg = readPackageJson();
+        const distPkg = {
+          ...pkg,
+          main: './dist/my-components.js',
+          module: './dist/my-components.js',
+          types: './dist/types/index.d.ts'
+        };
+        writePackageJson(distPkg);
+      },
+      closeBundle() {
+        // 构建结束后：改回 src 路径
+        const pkg = readPackageJson();
+        const srcPkg = {
+          ...pkg,
+          main: 'src/components/index.ts',
+          module: 'src/components/index.ts',
+          types: 'src/vite-env.d.ts'
+        };
+        writePackageJson(srcPkg);
+      }
+    }
   ],
-  // server: {
-  //   fs: {
-  //     strict: false  // 添加这个配置，允许访问工作区以外的文件
-  //   }
-  // },
   build: {
     // 库模式配置，指定入口文件和输出格式
     lib: {
@@ -30,37 +71,7 @@ export default defineConfig({
     },
     rollupOptions: {
       // 告诉打包工具，vue 和 naive-ui 是外部依赖，不要打包进组件库
-      external: ['vue', 'naive-ui'],
-      output: {
-        // 在这里添加 hooks
-        plugins: [{
-          name: 'generate-package-json',
-          generateBundle() {
-            // 读取原始的 package.json
-            const pkg = require('./package.json');
-            
-            // 创建用于生产环境的 package.json
-            const distPkg = {
-              name: pkg.name,
-              version: pkg.version,
-              type: pkg.type,
-              main: './my-components.js',
-              module: './my-components.js',
-              types: './types/index.d.ts',
-              peerDependencies: pkg.peerDependencies
-            };
-
-            // 写入到 dist 目录
-            writeFileSync(
-              'dist/package.json',
-              JSON.stringify(distPkg, null, 2)
-            );
-
-            // 复制 README.md 到 dist 目录
-            copyFileSync('README.md', 'dist/README.md');
-          }
-        }]
-      }
+      external: ['vue', 'naive-ui']
     },
   },
   // 预构建 naive-ui 和 vue，提高开发服务器性能，确保依赖版本一致性
