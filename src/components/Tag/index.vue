@@ -1,11 +1,10 @@
 <template>
-  <n-button
+  <n-tag
     v-bind="$attrs"
     @click="handleClick"
   >
-    <!-- <slot>{{ text }}</slot> -->
-    <span>123</span>
-  </n-button>
+    <slot>{{ text }}</slot>
+  </n-tag>
 </template>
 
 <script setup lang="ts">
@@ -15,7 +14,7 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-  text: '默认按钮',
+  text: '默认标签',
 });
 
 const emit = defineEmits<{
