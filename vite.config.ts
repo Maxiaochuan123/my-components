@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-// import { writeFileSync } from 'fs';
+import { writeFileSync, copyFileSync } from 'fs';
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
 import dts from 'vite-plugin-dts';
@@ -31,32 +31,36 @@ export default defineConfig({
     rollupOptions: {
       // 告诉打包工具，vue 和 naive-ui 是外部依赖，不要打包进组件库
       external: ['vue', 'naive-ui'],
-      // output: {
-      //   // 在这里添加 hooks
-      //   plugins: [{
-      //     name: 'generate-package-json',
-      //     generateBundle() {
-      //       const pkg = require('./package.json');
-      //       const distPkg = {
-      //         name: pkg.name,
-      //         version: pkg.version,
-      //         type: pkg.type,
-      //         main: 'my-components.js',
-      //         module: 'my-components.js',
-      //         types: 'types/index.d.ts',
-              
-      //         // main: "./dist/my-components.js",
-      //         // module: './dist/my-components.js',
-      //         // types: './dist/types/index.d.ts',
-      //         peerDependencies: pkg.peerDependencies
-      //       };
-      //       writeFileSync(
-      //         'dist/package.json',
-      //         JSON.stringify(distPkg, null, 2)
-      //       );
-      //     }
-      //   }]
-      // }
+      output: {
+        // 在这里添加 hooks
+        plugins: [{
+          name: 'generate-package-json',
+          generateBundle() {
+            // 读取原始的 package.json
+            const pkg = require('./package.json');
+            
+            // 创建用于生产环境的 package.json
+            const distPkg = {
+              name: pkg.name,
+              version: pkg.version,
+              type: pkg.type,
+              main: './my-components.js',
+              module: './my-components.js',
+              types: './types/index.d.ts',
+              peerDependencies: pkg.peerDependencies
+            };
+
+            // 写入到 dist 目录
+            writeFileSync(
+              'dist/package.json',
+              JSON.stringify(distPkg, null, 2)
+            );
+
+            // 复制 README.md 到 dist 目录
+            copyFileSync('README.md', 'dist/README.md');
+          }
+        }]
+      }
     },
   },
   // 预构建 naive-ui 和 vue，提高开发服务器性能，确保依赖版本一致性
