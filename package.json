@@ -7,7 +7,7 @@
   "module": "src/components/index.ts",
   "types": "src/vite-env.d.ts",
   "files": [
-    "src"
+    "dist"
   ],
   "scripts": {
     "dev": "vite",
